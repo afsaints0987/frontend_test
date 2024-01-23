@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Avatar from "boring-avatars";
 import {
   FaRegCircleXmark,
@@ -21,6 +21,8 @@ const Gallery = ({ users }: GalleryProps) => {
   const [usersList, setUsersList] = useState(users);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [sortedField, setSortedField] = useState<string | null>(null);
+  const [sortedDirection, setSortedDirection] = useState<string | null>(null)
 
   const handleModalOpen = (id: number) => {
     const user = usersList.find((item) => item.id === id) || null;
@@ -36,11 +38,47 @@ const Gallery = ({ users }: GalleryProps) => {
     setIsModalOpen(false);
   };
 
+  const handleSortedField = (field: string | null) => {
+    setSortedField(field || null)
+  }
+  const handleSortedDirection= (direction: string ) => {
+    setSortedDirection(direction || null)
+  }
+
+  const sortData = () => {
+    if(sortedField && sortedDirection){
+      const sortedData = [...usersList].sort((a, b) => {
+        let aValue;
+        let bValue;
+
+        if(sortedField === "company"){
+          aValue = a.company.name
+          bValue = b.company.name
+        } else {
+          aValue = a[sortedField]
+          bValue = b[sortedField]
+        }
+
+        if(sortedDirection === 'ascending'){
+          return aValue.localeCompare(bValue)
+        } else {
+          return bValue.localeCompare(aValue)
+        }
+
+      })
+      setUsersList(sortedData)
+    }
+  }
+
+  useEffect(() => {
+    sortData()
+  })
+
   return (
     <div className="user-gallery">
       <div className="heading">
         <h1 className="title">Users</h1>
-        <Controls />
+        <Controls handleSetField={handleSortedField} handleSetDirection={handleSortedDirection}/>
       </div>
       <div className="items">
         {usersList.map((user, index) => (
@@ -58,9 +96,9 @@ const Gallery = ({ users }: GalleryProps) => {
               />
             </div>
             <div className="info">
-              <div className="name">{user.name}</div>
-              <div className="company">{user.company.name}</div>
-            </div>
+                <div className="name">{user.name}</div>
+                <div className="company">{user.company.name}</div>
+              </div> 
           </div>
         ))}
         <Modal isOpen={isModalOpen} onClose={handleModalClose}>
