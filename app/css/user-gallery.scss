@@ -1,3 +1,15 @@
+@mixin responsive-columns {
+  grid-template-columns: 1fr 1fr 1fr; // Default for desktop
+
+  @media screen and (max-width: 600px) {
+    grid-template-columns: 1fr; // Mobile view
+  }
+
+  @media screen and (min-width: 601px) and (max-width: 1023px) {
+    grid-template-columns: 1fr 1fr; // Tablet view
+  }
+}
+
 .user-gallery {
   width: 100%;
 
@@ -7,9 +19,7 @@
     grid-template-rows: auto;
     grid-gap: 16px;
 
-    @media screen and (max-width: 480px) {
-      grid-template-columns: 1fr;
-    }
+    @include responsive-columns()
   }
 
   > .heading + .items {
